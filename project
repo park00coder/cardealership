@@ -1,0 +1,66 @@
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Load the dataset
+data_url = "https://drive.google.com/file/d/1Li-1EvAmOW8qznQTQKHy3nueOYSf855V/view?usp=sharing"
+data_path = "car_data.csv"
+# Download and load the dataset
+data = pd.read_csv(data_path)
+
+# Data Preprocessing
+# Handle missing values (if any)
+data.dropna(inplace=True)
+
+# Exploratory Data Analysis (EDA)
+# Visualize the relationship between mileage and sale prices for each brand
+brands = data['Brand'].unique()
+plt.figure(figsize=(12, 6))
+
+for brand in brands:
+    brand_data = data[data['Brand'] == brand]
+    plt.scatter(brand_data['Mileage'], brand_data['Price'], label=brand)
+
+plt.xlabel('Mileage')
+plt.ylabel('Price')
+plt.legend()
+plt.title('Mileage vs. Price for Different Car Brands')
+plt.show()
+
+# Data Splitting
+X = data[['Mileage']]
+y = data['Price']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Choose a Linear Regression Model
+model = LinearRegression()
+
+# Model Training
+model.fit(X_train, y_train)
+
+# Model Evaluation
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse:.2f}")
+print(f"R-squared: {r2:.2f}")
+
+# Interpret the Coefficients
+slope = model.coef_[0]
+intercept = model.intercept_
+print(f"Slope (Coefficient): {slope:.2f}")
+print(f"Intercept: {intercept:.2f}")
+
+# Make Predictions
+new_mileages = np.array([80000, 60000, 40000]).reshape(-1, 1)
+predicted_prices = model.predict(new_mileages)
+for mileage, price in zip(new_mileages, predicted_prices):
+    print(f"Predicted Price for Mileage {mileage[0]}: ${price:.2f}")
+
+# Provide Recommendations
+# You can provide pricing recommendations based on the model's predictions and your business objectives.
